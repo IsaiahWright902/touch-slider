@@ -51,3 +51,40 @@ function touchStart(index) {
   }
 }
 
+function touchMove(event) {
+  if (isDragging) {
+    const currentPosition = getPositionX(event)
+    currentTranslate = prevTranslate + currentPosition - startPos
+  }
+}
+
+function touchEnd() {
+  cancelAnimationFrame(animationID)
+  isDragging = false
+  const movedBy = currentTranslate - prevTranslate
+
+  // if moved enough negative then snap to next slide if there is one
+  if (movedBy < -100 && currentIndex < slides.length - 1) currentIndex += 1
+
+  // if moved enough positive then snap to previous slide if there is one
+  if (movedBy > 100 && currentIndex > 0) currentIndex -= 1
+
+  setPositionByIndex()
+
+  slider.classList.remove('grabbing')
+}
+
+function animation() {
+  setSliderPosition()
+  if (isDragging) requestAnimationFrame(animation)
+}
+
+function setPositionByIndex() {
+  currentTranslate = currentIndex * -window.innerWidth
+  prevTranslate = currentTranslate
+  setSliderPosition()
+}
+
+function setSliderPosition() {
+  slider.style.transform = `translateX(${currentTranslate}px)`
+}
